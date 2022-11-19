@@ -1,22 +1,32 @@
-import "leaflet";
+exports.createLeafletInterface = (domId, options) => {
+  const map = domId || "map";
+  const mapOptions = options || { center: [-18.933333, 47.516667], zoom: 11 };
 
-const TANA_latlong = [-18.933333, 47.516667];
-const MAP_ZOOM = 11;
+  // Setup the map properties for leaflet
+  return L.map(map, mapOptions);
+};
 
-// Setup the map properties for leaflet
-const map = L.map("map", {
-  center: TANA_latlong,
-  zoom: MAP_ZOOM,
-});
+exports.addTiler = (map, TileLayer, options) => {
+  // Add Tiles from openstreetmap if no Tiles given
+  const mapLayer =
+    TileLayer || "https://tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}";
 
-// Add maptiler to the map Maptiler tiles
-L.tileLayer(
-  `https://api.maptiler.com/maps/bright-v2/{z}/{x}/{y}.png?key=${process.env.TILE_LAYER_KEY}`,
-  {
-    attribution:
-      '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
-  }
-).addTo(map);
+  // Options like attributions
+  const mapOptions = options || {};
 
-// Add marker
-var marker = L.marker(TANA_latlong).addTo(map);
+  // Add tiles to the map
+  L.tileLayer(mapLayer, mapOptions).addTo(map);
+};
+
+exports.addMarker = (map, latlong, icon) => {
+  const markerIcon = icon || {};
+
+  // Add marker
+  return L.marker(latlong, markerIcon).addTo(map);
+};
+
+exports.showPopup = (marker, text) => {
+  const popup = text || "Hello...";
+  // Add popup
+  marker.bindPopup(popup).openPopup();
+};

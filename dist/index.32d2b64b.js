@@ -532,29 +532,34 @@ function hmrAcceptRun(bundle, id) {
 }
 
 },{}],"f2QDv":[function(require,module,exports) {
-var _leaflet = require("./leaflet");
-console.log(map);
+var _bases = require("./bases"); // console.log(map);
 
-},{"./leaflet":"xvuTT"}],"xvuTT":[function(require,module,exports) {
+},{"./bases":"4pFPa"}],"4pFPa":[function(require,module,exports) {
 var _leaflet = require("leaflet");
+var _leaflet1 = require("./leaflet");
 const TANA_latlong = [
     -18.933333,
     47.516667
 ];
-const MAP_ZOOM = 11;
-// Setup the map properties for leaflet
-const map = L.map("map", {
+const MAP_ZOOM = 15;
+const mapOptions = {
     center: TANA_latlong,
     zoom: MAP_ZOOM
-});
-// Add maptiler to the map Maptiler tiles
-L.tileLayer(`https://api.maptiler.com/maps/bright-v2/{z}/{x}/{y}.png?key=${"IwCekkGDGWBNaslxu9Cg"}`, {
+};
+// Create map controller
+const map = (0, _leaflet1.createLeafletInterface)("map", mapOptions);
+// Tiles from maptiler
+const tiles = `https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${"IwCekkGDGWBNaslxu9Cg"}`;
+// Attribution for the tiles
+const attribution = {
     attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
-}).addTo(map);
-// Add marker
-var marker = L.marker(TANA_latlong).addTo(map);
+};
+(0, _leaflet1.addTiler)(map, tiles, attribution);
+// ADD marker to the antananarivo point
+const marker = (0, _leaflet1.addMarker)(map, TANA_latlong);
+(0, _leaflet1.showPopup)(marker, "<b> Hello </b></br> I am a marker.");
 
-},{"leaflet":"iFbO2"}],"iFbO2":[function(require,module,exports) {
+},{"leaflet":"iFbO2","./leaflet":"xvuTT"}],"iFbO2":[function(require,module,exports) {
 /* @preserve
  * Leaflet 1.9.2, a JS library for interactive maps. https://leafletjs.com
  * (c) 2010-2022 Vladimir Agafonkin, (c) 2010-2011 CloudMade
@@ -11051,6 +11056,38 @@ var marker = L.marker(TANA_latlong).addTo(map);
     // Always export us to window global (see #2364)
     window.L = exports1;
 });
+
+},{}],"xvuTT":[function(require,module,exports) {
+exports.createLeafletInterface = (domId, options)=>{
+    const map = domId || "map";
+    const mapOptions = options || {
+        center: [
+            -18.933333,
+            47.516667
+        ],
+        zoom: 11
+    };
+    // Setup the map properties for leaflet
+    return L.map(map, mapOptions);
+};
+exports.addTiler = (map, TileLayer, options)=>{
+    // Add Tiles from openstreetmap if no Tiles given
+    const mapLayer = TileLayer || "https://tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}";
+    // Options like attributions
+    const mapOptions = options || {};
+    // Add tiles to the map
+    L.tileLayer(mapLayer, mapOptions).addTo(map);
+};
+exports.addMarker = (map, latlong, icon)=>{
+    const markerIcon = icon || {};
+    // Add marker
+    return L.marker(latlong, markerIcon).addTo(map);
+};
+exports.showPopup = (marker, text)=>{
+    const popup = text || "Hello...";
+    // Add popup
+    marker.bindPopup(popup).openPopup();
+};
 
 },{}]},["dhFGg","f2QDv"], "f2QDv", "parcelRequirecbe0")
 

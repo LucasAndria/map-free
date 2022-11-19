@@ -1,3 +1,3 @@
-import "./leaflet";
+import "./bases";
 
-console.log(map);
+// console.log(map);
