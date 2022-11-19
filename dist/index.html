@@ -11,21 +11,42 @@
     <title>Leaflet-map</title>
   </head>
   <body>
-    <form class="form-controller">
+    <!-- one point to another point -->
+    <!-- <form class="form form_point-to-point">
       <div>
         <label for="from">Départ: </label>
-        <input name="from" type="text" id="from">
+        <input name="from" type="text" id="from" />
       </div>
 
       <div>
         <label for="to">Déstination: </label>
-        <input name="to" type="text" id="to">
+        <input name="to" type="text" id="to" />
+      </div>
+
+      <div>
+        <button type="submit">Go</button>
+      </div>
+    </form> -->
+
+    <form class="form form_client-to-stores" autocomplete="off">
+      <div>
+        <label for="from">Location : </label>
+        <input name="from" type="text" id="from">
+        <button id="me" type="button">o</button>
+      </div>
+
+      <div>
+        <label for="to">Stores : </label>
+        <div class="autocomplete" style="width: auto">
+          <input name="to" type="text" id="to">
+        </div>
       </div>
 
       <div>
         <button type="submit">Go</button>
       </div>
     </form>
+
     <div id="map"></div>
   </body>
 </html>

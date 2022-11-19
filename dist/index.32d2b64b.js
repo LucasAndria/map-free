@@ -532,13 +532,22 @@ function hmrAcceptRun(bundle, id) {
 }
 
 },{}],"f2QDv":[function(require,module,exports) {
-var _initMap = require("./init-map");
-/* Here is all the DOM controls */ const formMapRoute = document.querySelector(".form-controller");
-if (formMapRoute) {
+// // Base map with marker and popup
+// import "./base-map";
+// // Marker with route
+// import "./display-route";
+// import { traceRoute, removeRoute } from "./display-route";
+// For stores
+// import "./store-map";
+var _storeMap = require("./store-map");
+/* Here is all the DOM controls */ const formPointToPoint = document.querySelector(".form_point-to-point");
+const formStores = document.querySelector(".form_client-to-stores");
+// if the form point to point is present on the DOM
+if (formPointToPoint) {
     let leafletRoute;
-    formMapRoute.addEventListener("submit", async (e)=>{
-        if (leafletRoute) (0, _initMap.removeRoute)(leafletRoute);
+    formPointToPoint.addEventListener("submit", async (e)=>{
         e.preventDefault();
+        if (leafletRoute) removeRoute(leafletRoute);
         // Get the value from input (later change into STRING)
         let from = document.getElementById("from").value;
         let to = document.getElementById("to").value;
@@ -547,22 +556,78 @@ if (formMapRoute) {
         to = JSON.parse(to);
         // Trace a route from point A to B
         // traceRoute([-18.933333, 47.516667], [-18.95, 47.58]);
-        [leafletRoute, data] = await (0, _initMap.traceRoute)(from, to, false);
+        [leafletRoute, data] = await traceRoute(from, to, false);
+        console.log(data);
+    });
+}
+// If the form store appear
+if (formStores) {
+    const user = document.getElementById("from");
+    const store = document.getElementById("to");
+    (0, _storeMap.autoComplete)(store);
+    function positionSuccess(data1) {
+        user.value = JSON.stringify([
+            data1.coords.latitude,
+            data1.coords.longitude
+        ]);
+    }
+    function positionFail() {
+        console.log("Fail");
+    }
+    document.getElementById("me").addEventListener("click", (e)=>{
+        navigator.geolocation.getCurrentPosition(positionSuccess, positionFail);
+    });
+    let leafletRoute1;
+    formStores.addEventListener("submit", async (e)=>{
+        e.preventDefault();
+        if (leafletRoute1) (0, _storeMap.deleteRoute)(leafletRoute1);
+        // Get the value from input (later change into STRING)
+        let from = document.getElementById("from").value;
+        let to = document.getElementById("to").value;
+        // Convert value into latlng (later will be geoCoding)
+        from = JSON.parse(from);
+        // to = JSON.parse(to);
+        // Trace a route from point A to B
+        // traceRoute([-18.933333, 47.516667], [-18.95, 47.58]);
+        [leafletRoute1, data] = await (0, _storeMap.addRoute)(from, to, false);
         console.log(data);
     });
 }
 
-},{"./init-map":"41nnL"}],"41nnL":[function(require,module,exports) {
+},{"./store-map":"jrY5b"}],"jrY5b":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _leaflet = require("leaflet");
+var _leafletRoutingMachine = require("leaflet-routing-machine");
 var _leaflet1 = require("./leaflet");
-var _route = require("./route");
-const TANA_latlong = [
-    -18.933333,
-    47.516667
+var _autoComplete = require("./auto-complete");
+var _autoCompleteDefault = parcelHelpers.interopDefault(_autoComplete);
+const stores = [
+    {
+        name: "ABC",
+        latlng: [
+            -18.933333,
+            47.516667
+        ]
+    },
+    {
+        name: "DEF",
+        latlng: [
+            -18.923333,
+            47.506667
+        ]
+    },
+    {
+        name: "GHI",
+        latlng: [
+            -18.943333,
+            47.526667
+        ]
+    }
 ];
+storesName = stores.map((el)=>el.name);
 const MAP_ZOOM = 15;
 const mapOptions = {
-    center: TANA_latlong,
+    center: stores[0].latlng,
     zoom: MAP_ZOOM
 };
 // Create map controller
@@ -573,18 +638,57 @@ const tiles = `https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${"I
 const attribution = {
     attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>'
 };
+// Add the image tiles of the map
 (0, _leaflet1.addTiler)(map, tiles, attribution);
-// ADD marker to the antananarivo point
-const marker = (0, _leaflet1.addMarker)(map, TANA_latlong);
-(0, _leaflet1.showPopup)(marker, "<b> Hello </b></br> I am a marker.");
-exports.traceRoute = async (a, b, displayWindow)=>{
-    return await (0, _route.addRoute)(map, a, b, displayWindow);
+// Add marker and popUp for all stores
+const markers = stores.map((el)=>{
+    let marker = (0, _leaflet1.addMarker)(map, el.latlng);
+    return marker;
+});
+exports.autoComplete = (element)=>{
+    (0, _autoCompleteDefault.default)(element, storesName, true);
 };
-exports.removeRoute = (control)=>{
-    (0, _route.deleteRoute)(map, control);
+// Draw a route
+exports.addRoute = async (userLatlng, storeName, controller = false)=>{
+    const [latA, lngA] = userLatlng;
+    // Convert storeName
+    const storeLatlngB = stores.filter((el)=>el.name === storeName)[0].latlng;
+    const [latB, lngB] = storeLatlngB;
+    const data = {
+        distance: 0,
+        time: 0,
+        header: ""
+    };
+    // Create route params and controls
+    let control = L.Routing.control({
+        waypoints: [
+            L.latLng(latA, lngA),
+            L.latLng(latB, lngB)
+        ]
+    });
+    // Add the control to the map
+    control.addTo(map);
+    const routingContainer = document.querySelector(".leaflet-routing-container");
+    if (!controller) routingContainer.style.display = "none";
+    try {
+        const routingAlt = await selectorPromise(".leaflet-routing-alt");
+        data.distance = routingAlt.children[1].innerText.split(",")[0];
+        data.time = routingAlt.children[1].innerText.split(",")[1];
+        data.header = routingAlt.children[0].innerText;
+    } catch  {
+        console.log("ERROR!!!");
+    }
+    return [
+        control,
+        data
+    ];
+};
+exports.deleteRoute = (control)=>{
+    console.log(map);
+    map.removeControl(control);
 };
 
-},{"leaflet":"iFbO2","./leaflet":"xvuTT","./route":"88hgd"}],"iFbO2":[function(require,module,exports) {
+},{"leaflet":"iFbO2","./leaflet":"xvuTT","./auto-complete":"5ZSXS","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","leaflet-routing-machine":"dzMVH"}],"iFbO2":[function(require,module,exports) {
 /* @preserve
  * Leaflet 1.9.2, a JS library for interactive maps. https://leafletjs.com
  * (c) 2010-2022 Vladimir Agafonkin, (c) 2010-2011 CloudMade
@@ -11114,47 +11218,102 @@ exports.showPopup = (marker, text)=>{
     marker.bindPopup(popup).openPopup();
 };
 
-},{}],"88hgd":[function(require,module,exports) {
-var _leafletRoutingMachine = require("leaflet-routing-machine");
-var _awaitDomQuery = require("./await-dom-query");
-// Trace a route from one point to another point
-exports.addRoute = async (map, latlngA, latlngB, controller = true)=>{
-    const [latA, lngA] = latlngA;
-    const [latB, lngB] = latlngB;
-    const data = {};
-    // Create route params and controls
-    let control = L.Routing.control({
-        waypoints: [
-            L.latLng(latA, lngA),
-            L.latLng(latB, lngB)
-        ]
+},{}],"5ZSXS":[function(require,module,exports) {
+module.exports = function autocomplete(inp, arr, showOnEmpty = false) {
+    /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/ var currentFocus;
+    /*execute a function when someone writes in the text field:*/ inp.addEventListener("input", function(e) {
+        var a, b, i, val = this.value;
+        /*close any already open lists of autocompleted values*/ closeAllLists();
+        if (!val && !showOnEmpty) return false;
+        currentFocus = -1;
+        /*create a DIV element that will contain the items (values):*/ a = document.createElement("DIV");
+        a.setAttribute("id", this.id + "autocomplete-list");
+        a.setAttribute("class", "autocomplete-items");
+        /*append the DIV element as a child of the autocomplete container:*/ this.parentNode.appendChild(a);
+        /*for each item in the array...*/ for(i = 0; i < arr.length; i++)/*check if the item starts with the same letters as the text field value:*/ if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+            /*create a DIV element for each matching element:*/ b = document.createElement("DIV");
+            /*make the matching letters bold:*/ b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+            b.innerHTML += arr[i].substr(val.length);
+            /*insert a input field that will hold the current array item's value:*/ b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+            /*execute a function when someone clicks on the item value (DIV element):*/ b.addEventListener("click", function(e) {
+                /*insert the value for the autocomplete text field:*/ inp.value = this.getElementsByTagName("input")[0].value;
+                /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/ closeAllLists();
+            });
+            a.appendChild(b);
+        }
     });
-    // Add the control to the map
-    control.addTo(map);
-    const routingContainer = document.querySelector(".leaflet-routing-container");
-    if (!controller) routingContainer.style.display = "none";
-    try {
-        const routingAlt = await (0, _awaitDomQuery.selectorPromise)(".leaflet-routing-alt");
-        data.distance = routingAlt.children[1].innerText.split(",")[0];
-        data.time = routingAlt.children[1].innerText.split(",")[1];
-        data.header = routingAlt.children[0].innerText;
-    } catch  {
-        console.log("ERROR!!!");
+    /*execute a function presses a key on the keyboard:*/ inp.addEventListener("keydown", function(e) {
+        var x = document.getElementById(this.id + "autocomplete-list");
+        if (x) x = x.getElementsByTagName("div");
+        if (e.keyCode == 40) {
+            /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/ currentFocus++;
+            /*and and make the current item more visible:*/ addActive(x);
+        } else if (e.keyCode == 38) {
+            //up
+            /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/ currentFocus--;
+            /*and and make the current item more visible:*/ addActive(x);
+        } else if (e.keyCode == 13) {
+            /*If the ENTER key is pressed, prevent the form from being submitted,*/ e.preventDefault();
+            if (currentFocus > -1) /*and simulate a click on the "active" item:*/ {
+                if (x) x[currentFocus].click();
+            }
+        }
+    });
+    function addActive(x) {
+        /*a function to classify an item as "active":*/ if (!x) return false;
+        /*start by removing the "active" class on all items:*/ removeActive(x);
+        if (currentFocus >= x.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = x.length - 1;
+        /*add class "autocomplete-active":*/ x[currentFocus].classList.add("autocomplete-active");
     }
-    // setTimeout(() => {
-    //   const routingAlt = document.querySelector(".leaflet-routing-alt");
-    //   console.log(routingAlt);
-    // }, 2000);
-    return [
-        control,
-        data
-    ];
-};
-exports.deleteRoute = (map, control)=>{
-    map.removeControl(control);
+    function removeActive(x) {
+        /*a function to remove the "active" class from all autocomplete items:*/ for(var i = 0; i < x.length; i++)x[i].classList.remove("autocomplete-active");
+    }
+    function closeAllLists(elmnt) {
+        /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/ var x = document.getElementsByClassName("autocomplete-items");
+        for(var i = 0; i < x.length; i++)if (elmnt != x[i] && elmnt != inp) x[i].parentNode.removeChild(x[i]);
+    }
+    /*execute a function when someone clicks in the document:*/ document.addEventListener("click", function(e) {
+        closeAllLists(e.target);
+    });
 };
 
-},{"leaflet-routing-machine":"dzMVH","./await-dom-query":"l7Gc0"}],"dzMVH":[function(require,module,exports) {
+},{}],"gkKU3":[function(require,module,exports) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, "__esModule", {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === "default" || key === "__esModule" || dest.hasOwnProperty(key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
+
+},{}],"dzMVH":[function(require,module,exports) {
 var global = arguments[3];
 (function() {
     function r(e, n, t) {
@@ -32739,19 +32898,6 @@ var global = arguments[3];
 }, {}, [
     53
 ]);
-
-},{}],"l7Gc0":[function(require,module,exports) {
-exports.selectorPromise = (str, time = 2000)=>{
-    return new Promise((resolve, reject)=>{
-        let doc = document.querySelector(str);
-        if (doc) return resolve(doc);
-        setTimeout(()=>{
-            doc = document.querySelector(str);
-            if (doc) return resolve(doc);
-            reject("Node can not be found!!");
-        }, time);
-    });
-};
 
 },{}]},["dhFGg","f2QDv"], "f2QDv", "parcelRequirecbe0")
 
