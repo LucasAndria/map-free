@@ -1,1 +1,3 @@
-import "leaflet";
+import "./leaflet";
+
+console.log(map);
