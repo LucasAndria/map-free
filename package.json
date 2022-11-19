@@ -1,0 +1,19 @@
+{
+  "name": "leaflet-map",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel serve ./index.html"
+  },
+  "author": "Lucas ANDRIANARIJAONA",
+  "license": "MIT",
+  "devDependencies": {
+    "parcel": "^2.8.0"
+  },
+  "dependencies": {
+    "esri-leaflet": "^3.0.8",
+    "leaflet": "^1.9.2",
+    "leaflet-routing-machine": "^3.2.12"
+  }
+}
