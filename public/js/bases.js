@@ -6,6 +6,8 @@ import {
   showPopup,
 } from "./leaflet";
 
+import { addRoute } from "./route";
+
 const TANA_latlong = [-18.933333, 47.516667];
 const MAP_ZOOM = 15;
 
@@ -32,3 +34,7 @@ addTiler(map, tiles, attribution);
 const marker = addMarker(map, TANA_latlong);
 
 showPopup(marker, "<b> Hello </b></br> I am a marker.");
+
+exports.traceRoute = (a, b) => {
+  addRoute(map, a, b);
+};
