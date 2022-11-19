@@ -532,24 +532,27 @@ function hmrAcceptRun(bundle, id) {
 }
 
 },{}],"f2QDv":[function(require,module,exports) {
-var _bases = require("./bases");
-const formMapRoute = document.querySelector(".form-controller");
-if (formMapRoute) formMapRoute.addEventListener("submit", (e)=>{
-    e.preventDefault();
-    // Get the value from input (later change into STRING)
-    let from = document.getElementById("from").value;
-    let to = document.getElementById("to").value;
-    // Convert value into latlng (later will be geoCoding)
-    from = JSON.parse(from);
-    to = JSON.parse(to);
-    console.log("from : ", from);
-    console.log("to : ", to);
-    // Trace a route from point A to B
-    // traceRoute([-18.933333, 47.516667], [-18.95, 47.58]);
-    (0, _bases.traceRoute)(from, to);
-});
+var _initMap = require("./init-map");
+/* Here is all the DOM controls */ const formMapRoute = document.querySelector(".form-controller");
+if (formMapRoute) {
+    let leafletRoute;
+    formMapRoute.addEventListener("submit", async (e)=>{
+        if (leafletRoute) (0, _initMap.removeRoute)(leafletRoute);
+        e.preventDefault();
+        // Get the value from input (later change into STRING)
+        let from = document.getElementById("from").value;
+        let to = document.getElementById("to").value;
+        // Convert value into latlng (later will be geoCoding)
+        from = JSON.parse(from);
+        to = JSON.parse(to);
+        // Trace a route from point A to B
+        // traceRoute([-18.933333, 47.516667], [-18.95, 47.58]);
+        [leafletRoute, data] = await (0, _initMap.traceRoute)(from, to);
+        console.log(data);
+    });
+}
 
-},{"./bases":"4pFPa"}],"4pFPa":[function(require,module,exports) {
+},{"./init-map":"41nnL"}],"41nnL":[function(require,module,exports) {
 var _leaflet = require("leaflet");
 var _leaflet1 = require("./leaflet");
 var _route = require("./route");
@@ -574,8 +577,11 @@ const attribution = {
 // ADD marker to the antananarivo point
 const marker = (0, _leaflet1.addMarker)(map, TANA_latlong);
 (0, _leaflet1.showPopup)(marker, "<b> Hello </b></br> I am a marker.");
-exports.traceRoute = (a, b)=>{
-    (0, _route.addRoute)(map, a, b);
+exports.traceRoute = async (a, b)=>{
+    return await (0, _route.addRoute)(map, a, b);
+};
+exports.removeRoute = (control)=>{
+    (0, _route.deleteRoute)(map, control);
 };
 
 },{"leaflet":"iFbO2","./leaflet":"xvuTT","./route":"88hgd"}],"iFbO2":[function(require,module,exports) {
@@ -11110,20 +11116,44 @@ exports.showPopup = (marker, text)=>{
 
 },{}],"88hgd":[function(require,module,exports) {
 var _leafletRoutingMachine = require("leaflet-routing-machine");
+var _awaitDomQuery = require("./await-dom-query");
 // Trace a route from one point to another point
-exports.addRoute = (map, latlngA, latlngB)=>{
-    [latA, lngA] = latlngA;
-    [latB, lngB] = latlngB;
-    // Add route to the map
-    L.Routing.control({
+exports.addRoute = async (map, latlngA, latlngB)=>{
+    const [latA, lngA] = latlngA;
+    const [latB, lngB] = latlngB;
+    const data = {};
+    // Create route params and controls
+    let control = L.Routing.control({
         waypoints: [
             L.latLng(latA, lngA),
             L.latLng(latB, lngB)
         ]
-    }).addTo(map);
+    });
+    // Add the control to the map
+    control.addTo(map);
+    const routingContainer = document.querySelector(".leaflet-routing-container");
+    try {
+        const routingAlt = await (0, _awaitDomQuery.selectorPromise)(".leaflet-routing-alt");
+        data.distance = routingAlt.children[1].innerText.split(",")[0];
+        data.time = routingAlt.children[1].innerText.split(",")[1];
+        data.header = routingAlt.children[0].innerText;
+    } catch  {
+        console.log("ERROR!!!");
+    }
+    // setTimeout(() => {
+    //   const routingAlt = document.querySelector(".leaflet-routing-alt");
+    //   console.log(routingAlt);
+    // }, 2000);
+    return [
+        control,
+        data
+    ];
+};
+exports.deleteRoute = (map, control)=>{
+    map.removeControl(control);
 };
 
-},{"leaflet-routing-machine":"dzMVH"}],"dzMVH":[function(require,module,exports) {
+},{"leaflet-routing-machine":"dzMVH","./await-dom-query":"l7Gc0"}],"dzMVH":[function(require,module,exports) {
 var global = arguments[3];
 (function() {
     function r(e, n, t) {
@@ -32708,6 +32738,19 @@ var global = arguments[3];
 }, {}, [
     53
 ]);
+
+},{}],"l7Gc0":[function(require,module,exports) {
+exports.selectorPromise = (str, time = 2000)=>{
+    return new Promise((resolve, reject)=>{
+        let doc = document.querySelector(str);
+        if (doc) return resolve(doc);
+        setTimeout(()=>{
+            doc = document.querySelector(str);
+            if (doc) return resolve(doc);
+            reject("Node can not be found!!");
+        }, time);
+    });
+};
 
 },{}]},["dhFGg","f2QDv"], "f2QDv", "parcelRequirecbe0")
 

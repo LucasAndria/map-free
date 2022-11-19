@@ -1,10 +1,15 @@
-import "./bases";
-import { traceRoute } from "./bases";
+import "./init-map";
+import { traceRoute, removeRoute } from "./init-map";
+
+/* Here is all the DOM controls */
 
 const formMapRoute = document.querySelector(".form-controller");
 
 if (formMapRoute) {
-  formMapRoute.addEventListener("submit", (e) => {
+  let leafletRoute;
+  formMapRoute.addEventListener("submit", async (e) => {
+    if (leafletRoute) removeRoute(leafletRoute);
+
     e.preventDefault();
 
     // Get the value from input (later change into STRING)
@@ -15,11 +20,10 @@ if (formMapRoute) {
     from = JSON.parse(from);
     to = JSON.parse(to);
 
-    console.log("from : ", from);
-    console.log("to : ", to);
-
     // Trace a route from point A to B
     // traceRoute([-18.933333, 47.516667], [-18.95, 47.58]);
-    traceRoute(from, to);
+    [leafletRoute, data] = await traceRoute(from, to);
+
+    console.log(data);
   });
 }
