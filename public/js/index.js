@@ -22,7 +22,7 @@ if (formMapRoute) {
 
     // Trace a route from point A to B
     // traceRoute([-18.933333, 47.516667], [-18.95, 47.58]);
-    [leafletRoute, data] = await traceRoute(from, to);
+    [leafletRoute, data] = await traceRoute(from, to, false);
 
     console.log(data);
   });

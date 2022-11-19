@@ -2,7 +2,7 @@ import "leaflet-routing-machine";
 import { selectorPromise } from "./await-dom-query";
 
 // Trace a route from one point to another point
-exports.addRoute = async (map, latlngA, latlngB) => {
+exports.addRoute = async (map, latlngA, latlngB, controller = true) => {
   const [latA, lngA] = latlngA;
   const [latB, lngB] = latlngB;
   const data = {};
@@ -16,6 +16,10 @@ exports.addRoute = async (map, latlngA, latlngB) => {
   control.addTo(map);
 
   const routingContainer = document.querySelector(".leaflet-routing-container");
+
+  if (!controller) {
+    routingContainer.style.display = "none";
+  }
 
   try {
     const routingAlt = await selectorPromise(".leaflet-routing-alt");

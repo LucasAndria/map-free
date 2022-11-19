@@ -35,8 +35,8 @@ const marker = addMarker(map, TANA_latlong);
 
 showPopup(marker, "<b> Hello </b></br> I am a marker.");
 
-exports.traceRoute = async (a, b) => {
-  return await addRoute(map, a, b);
+exports.traceRoute = async (a, b, displayWindow) => {
+  return await addRoute(map, a, b, displayWindow);
 };
 
 exports.removeRoute = (control) => {

@@ -547,7 +547,7 @@ if (formMapRoute) {
         to = JSON.parse(to);
         // Trace a route from point A to B
         // traceRoute([-18.933333, 47.516667], [-18.95, 47.58]);
-        [leafletRoute, data] = await (0, _initMap.traceRoute)(from, to);
+        [leafletRoute, data] = await (0, _initMap.traceRoute)(from, to, false);
         console.log(data);
     });
 }
@@ -577,8 +577,8 @@ const attribution = {
 // ADD marker to the antananarivo point
 const marker = (0, _leaflet1.addMarker)(map, TANA_latlong);
 (0, _leaflet1.showPopup)(marker, "<b> Hello </b></br> I am a marker.");
-exports.traceRoute = async (a, b)=>{
-    return await (0, _route.addRoute)(map, a, b);
+exports.traceRoute = async (a, b, displayWindow)=>{
+    return await (0, _route.addRoute)(map, a, b, displayWindow);
 };
 exports.removeRoute = (control)=>{
     (0, _route.deleteRoute)(map, control);
@@ -11118,7 +11118,7 @@ exports.showPopup = (marker, text)=>{
 var _leafletRoutingMachine = require("leaflet-routing-machine");
 var _awaitDomQuery = require("./await-dom-query");
 // Trace a route from one point to another point
-exports.addRoute = async (map, latlngA, latlngB)=>{
+exports.addRoute = async (map, latlngA, latlngB, controller = true)=>{
     const [latA, lngA] = latlngA;
     const [latB, lngB] = latlngB;
     const data = {};
@@ -11132,6 +11132,7 @@ exports.addRoute = async (map, latlngA, latlngB)=>{
     // Add the control to the map
     control.addTo(map);
     const routingContainer = document.querySelector(".leaflet-routing-container");
+    if (!controller) routingContainer.style.display = "none";
     try {
         const routingAlt = await (0, _awaitDomQuery.selectorPromise)(".leaflet-routing-alt");
         data.distance = routingAlt.children[1].innerText.split(",")[0];
