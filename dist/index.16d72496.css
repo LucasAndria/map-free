@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.form-controller {
+  height: 10vh;
+  background: #e4cfcf;
+  justify-content: space-evenly;
+  align-items: center;
+  display: flex;
+}
+
+.form-controller input:focus {
+  outline: none;
+}
+
+#map {
+  height: 90vh;
+}
+
+/*# sourceMappingURL=index.16d72496.css.map */
