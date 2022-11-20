@@ -24,8 +24,8 @@ const attribution = {
 
 addTiler(map, tiles, attribution);
 
-exports.traceRoute = async (a, b, displayWindow) => {
-  return await addRoute(map, a, b, displayWindow);
+exports.traceRoute = async (a, b, showController) => {
+  return await addRoute(map, a, b, showController);
 };
 
 exports.removeRoute = (control) => {
