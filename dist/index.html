@@ -6,27 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/index.a4ebd8ff.css">
     <link rel="stylesheet" href="/index.4c0c633c.css">
+    <link rel="stylesheet" href="/index.428e656c.css">
     <link rel="stylesheet" href="/index.16d72496.css">
     <script src="/index.32d2b64b.js" defer=""></script>
     <title>Leaflet-map</title>
   </head>
   <body>
     <!-- one point to another point -->
-    <form class="form form_point-to-point">
+    <!-- <form class="form form_point-to-point">
       <div>
         <label for="from">Départ: </label>
-        <input name="from" type="text" id="from">
+        <input name="from" type="text" id="from" />
       </div>
 
       <div>
         <label for="to">Déstination: </label>
-        <input name="to" type="text" id="to">
+        <input name="to" type="text" id="to" />
       </div>
 
       <div>
         <button type="submit">Go</button>
       </div>
-    </form>
+    </form> -->
 
     <!-- user location to a store -->
     <!-- <form class="form form_client-to-stores" autocomplete="off">
@@ -47,6 +48,20 @@
         <button type="submit">Go</button>
       </div>
     </form> -->
+
+    <!-- user location to a store -->
+    <form class="form form_autocomplete" autocomplete="off">
+      <div>
+        <label for="ac-input">Find : </label>
+        <div class="autocomplete" style="width: auto">
+          <input name="ac-input" type="text" id="ac-input">
+        </div>
+      </div>
+
+      <div>
+        <button type="submit">Find</button>
+      </div>
+    </form>
 
     <div id="map"></div>
   </body>

@@ -2,17 +2,22 @@
 // import "./base-map";
 
 // // Marker with route
-import "./display-route";
-import { traceRoute, removeRoute } from "./display-route";
+// import "./display-route";
+// import { traceRoute, removeRoute } from "./display-route";
 
 // For stores
 // import "./store-map";
 // import { autoComplete, addRoute, deleteRoute } from "./store-map";
 
+// For autocomplete
+import "./leaflet-auto-complete";
+import { geoCode } from "./leaflet-auto-complete";
+
 /* Here is all the DOM controls */
 
 const formPointToPoint = document.querySelector(".form_point-to-point");
 const formStores = document.querySelector(".form_client-to-stores");
+const formAC = document.querySelector(".form_autocomplete");
 
 // if the form point to point is present on the DOM
 if (formPointToPoint) {
@@ -73,5 +78,14 @@ if (formStores) {
     [leafletRoute, data, error] = await addRoute(from, to, false);
 
     console.log(error);
+  });
+}
+
+if (formAC) {
+  formAC.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const request = document.getElementById("ac-input").value;
+    geoCode(request);
   });
 }
