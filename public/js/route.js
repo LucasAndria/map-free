@@ -1,11 +1,11 @@
 import "leaflet-routing-machine";
-import { selectorPromise } from "./await-dom-query";
+import { selectorPromise } from "./await-dom";
 
-// Trace a route from one point to another point
+// Draw a route from one point to another point
 exports.addRoute = async (map, latlngA, latlngB, controller = true) => {
   const [latA, lngA] = latlngA;
   const [latB, lngB] = latlngB;
-  const data = {};
+  const data = { distance: 0, time: 0, header: "" };
 
   // Create route params and controls
   let control = L.Routing.control({
@@ -30,11 +30,6 @@ exports.addRoute = async (map, latlngA, latlngB, controller = true) => {
   } catch {
     console.log("ERROR!!!");
   }
-  // setTimeout(() => {
-  //   const routingAlt = document.querySelector(".leaflet-routing-alt");
-
-  //   console.log(routingAlt);
-  // }, 2000);
 
   return [control, data];
 };
