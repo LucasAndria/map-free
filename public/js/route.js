@@ -38,7 +38,6 @@ exports.addRoute = async (map, latlngA, latlngB, controller = true) => {
 
   try {
     const dataFromEvent = await controlEventPromise(control);
-    document.querySelector(".leaflet-routing-container").style.display = "none";
     const routes = dataFromEvent.routes;
     const summary = routes[0].summary;
 
@@ -49,7 +48,6 @@ exports.addRoute = async (map, latlngA, latlngB, controller = true) => {
     data.distance = Math.round(summary.totalDistance / 10) / 100;
     data.time = Math.round(((summary.totalTime % 3600) / 60) * 100) / 100;
   } catch (err) {
-    console.log(err);
     error = err;
   }
 
