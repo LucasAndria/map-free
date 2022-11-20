@@ -2,12 +2,12 @@
 // import "./base-map";
 
 // // Marker with route
-// import "./display-route";
-// import { traceRoute, removeRoute } from "./display-route";
+import "./display-route";
+import { traceRoute, removeRoute } from "./display-route";
 
 // For stores
 // import "./store-map";
-import { autoComplete, addRoute, deleteRoute } from "./store-map";
+// import { autoComplete, addRoute, deleteRoute } from "./store-map";
 
 /* Here is all the DOM controls */
 
@@ -31,9 +31,9 @@ if (formPointToPoint) {
 
     // Trace a route from point A to B
     // traceRoute([-18.933333, 47.516667], [-18.95, 47.58]);
-    [leafletRoute, data] = await traceRoute(from, to, false);
+    const [control, data, error] = await traceRoute(from, to, false);
 
-    console.log(data);
+    console.log(control);
   });
 }
 
@@ -70,8 +70,8 @@ if (formStores) {
 
     // Trace a route from point A to B
     // traceRoute([-18.933333, 47.516667], [-18.95, 47.58]);
-    [leafletRoute, data] = await addRoute(from, to, false);
+    [leafletRoute, data, error] = await addRoute(from, to, false);
 
-    console.log(data);
+    console.log(error);
   });
 }
