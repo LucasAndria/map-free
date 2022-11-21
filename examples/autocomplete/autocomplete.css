@@ -1,25 +1,5 @@
-body {
-  margin: 0;
-  padding: 0;
-}
-
-.form {
-  height: 5vh;
-  background: rgb(228, 207, 207);
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-}
-
-.form input:focus {
-  outline: none;
-}
-
-#map {
-  height: 95vh;
-}
-
 .autocomplete {
+  font: 16px Arial;
   /*the container must be positioned relative:*/
   position: relative;
   display: inline-block;
@@ -29,7 +9,7 @@ body {
   border: 1px solid #d4d4d4;
   border-bottom: none;
   border-top: none;
-  z-index: 401;
+  z-index: 99;
   /*position the autocomplete items to be the same width as the container:*/
   top: 100%;
   left: 0;
