@@ -20,3 +20,5 @@ yarn-error.log*
 .env
 .local
 config.env
+
+dist
