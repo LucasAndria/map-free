@@ -5,13 +5,16 @@
   "main": "index.js",
   "scripts": {
     "start": "parcel serve ./index.html",
-    "start:autocomplete": "parcel ./autocomplete.html -p 3000"
+    "start:autocomplete": "parcel ./autocomplete.html -p 3000",
+    "start:basemap": "parcel ./basemap.html -p 3000"
   },
   "author": "Lucas ANDRIANARIJAONA",
   "license": "MIT",
   "devDependencies": {
     "buffer": "^5.7.1",
+    "cssnano": "^5.1.14",
     "parcel": "^2.8.0",
+    "postcss": "^8.4.19",
     "process": "^0.11.10"
   },
   "dependencies": {
