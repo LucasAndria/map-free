@@ -5,6 +5,4 @@ exports.autocomplete = (containerId, array, showOnEmpty) => {
   autocomplete(containerId, array, showOnEmpty);
 };
 
-exports.myRouting = (startPoint, endPoint, profile) => {
-  return routing(startPoint, endPoint, profile);
-};
+exports.myRouting = routing;
