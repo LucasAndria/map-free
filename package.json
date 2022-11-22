@@ -12,9 +12,7 @@
   "license": "MIT",
   "devDependencies": {
     "buffer": "^5.7.1",
-    "cssnano": "^5.1.14",
     "parcel": "^2.8.0",
-    "postcss": "^8.4.19",
     "process": "^0.11.10"
   },
   "dependencies": {
