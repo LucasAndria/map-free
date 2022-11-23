@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./examples/autocomplete/autocomplete.css " />
     <link rel="stylesheet" href="./ressources/leaflet/leaflet.css" />
     <script src="./examples/geocoding/index.js" type="module" defer></script>
     <title>Geocoding</title>
@@ -11,7 +12,13 @@
   <body>
     <div class="controller">
       <form class="form-geocoding">
-        <input type="text" />
+        <div id="auto_lieu">
+          <input
+            type="text"
+            id="recherche_lieu"
+            placeholder="trouver un lieu"
+          />
+        </div>
       </form>
     </div>
     <div id="map"></div>
