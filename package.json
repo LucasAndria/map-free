@@ -7,6 +7,7 @@
     "start": "parcel serve ./index.html",
     "start:autocomplete": "parcel ./autocomplete.html -p 3000",
     "start:basemap": "parcel ./basemap.html -p 3000",
+    "start:geocoding": "parcel ./geocoding.html -p 3000",
     "start:route": "parcel ./route.html -p 3000"
   },
   "author": "Lucas ANDRIANARIJAONA",
