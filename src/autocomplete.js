@@ -1,11 +1,11 @@
 function autocomplete(inp, arr, showOnEmpty = false) {
   /*the autocomplete function takes two arguments,
   the text field element and an array of possible autocompleted values:*/
-  var currentFocus;
+  let currentFocus;
 
   /*execute a function when someone writes in the text field:*/
   inp.addEventListener("input", function (e) {
-    var a,
+    let a,
       b,
       i,
       val = this.value;
@@ -50,18 +50,18 @@ function autocomplete(inp, arr, showOnEmpty = false) {
 
   /*execute a function presses a key on the keyboard:*/
   inp.addEventListener("keydown", function (e) {
-    var x = document.getElementById(this.id + "autocomplete-list");
+    let x = document.getElementById(this.id + "autocomplete-list");
     if (x) x = x.getElementsByTagName("div");
     if (e.keyCode == 40) {
       /*If the arrow DOWN key is pressed,
-        increase the currentFocus variable:*/
+        increase the currentFocus letiable:*/
       currentFocus++;
       /*and and make the current item more visible:*/
       addActive(x);
     } else if (e.keyCode == 38) {
       //up
       /*If the arrow UP key is pressed,
-        decrease the currentFocus variable:*/
+        decrease the currentFocus letiable:*/
       currentFocus--;
       /*and and make the current item more visible:*/
       addActive(x);
@@ -88,7 +88,7 @@ function autocomplete(inp, arr, showOnEmpty = false) {
 
   function removeActive(x) {
     /*a function to remove the "active" class from all autocomplete items:*/
-    for (var i = 0; i < x.length; i++) {
+    for (let i = 0; i < x.length; i++) {
       x[i].classList.remove("autocomplete-active");
     }
   }
@@ -96,8 +96,8 @@ function autocomplete(inp, arr, showOnEmpty = false) {
   function closeAllLists(elmnt) {
     /*close all autocomplete lists in the document,
     except the one passed as an argument:*/
-    var x = document.getElementsByClassName("autocomplete-items");
-    for (var i = 0; i < x.length; i++) {
+    let x = document.getElementsByClassName("autocomplete-items");
+    for (let i = 0; i < x.length; i++) {
       if (elmnt != x[i] && elmnt != inp) {
         x[i].parentNode.removeChild(x[i]);
       }

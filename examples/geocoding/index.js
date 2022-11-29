@@ -1,15 +1,13 @@
 import "leaflet";
 import { geocoding, autocomplete } from "../../src/index";
+import blabla from "../../src/geo_autocomplete";
 
 const formGeocoding = document.querySelector(".form-geocoding");
 
 (async () => {
-  const input = document.getElementById("recherche_lieu");
   let data = { labels: [] };
-  input.addEventListener("input", async () => {
-    data = await geocoding();
-    autocomplete("auto_lieu", data.labels);
-  });
+  data = await geocoding();
+  blabla("auto_lieu", data.labels);
 })();
 
 // if (formGeocoding) {
@@ -23,7 +21,6 @@ const formGeocoding = document.querySelector(".form-geocoding");
 //     autocomplete_timeout = setTimeout(async () => {
 //       const data = await geocoding();
 
-//       console.log("ok");
 //       autocomplete("auto_lieu", data.labels);
 //     }, 1000);
 //   });
