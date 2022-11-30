@@ -1,6 +1,6 @@
-import data from "../examples/geocoding/ressources/res_autocomplete";
+import axios from "axios";
 
-function async_autocomplete(container_id) {
+export default (container_id) => {
   const container = document.getElementById(container_id);
   if (!container || container.tagName.toLowerCase() !== "div") return;
 
@@ -26,6 +26,7 @@ function async_autocomplete(container_id) {
 
   /*execute a function when someone writes in the text field:*/
   inp.addEventListener("input", function (e) {
+    // Reset the timeout if there are any
     if (autocomplete_timeout) clearTimeout(autocomplete_timeout);
     let a,
       b,
@@ -48,37 +49,50 @@ function async_autocomplete(container_id) {
       /*append the DIV element as a child of the autocomplete container:*/
       this.parentNode.appendChild(a);
 
-      // Tokony form {label : "balblaba", latlng: "21,52"}
-      const arr = data.features.map((el) => {
-        return { label: el.properties.label, latlng: el.geometry.coordinates };
-      });
+      // Call for the autocomplete api
+      try {
+        const res = await axios({
+          method: "GET",
+          url: `https://api.openrouteservice.org/geocode/autocomplete?api_key=${process.env.OPEN_ROUTE_SERVICE_KEY}&text=${e.target.value}`,
+        });
+        const data = res.data;
 
-      arr.forEach((el) => {
-        if (
-          el.label.substr(0, val.length).toUpperCase() === val.toUpperCase()
-        ) {
-          /*create a DIV element for each matching element:*/
-          b = document.createElement("DIV");
-          /*make the matching letters bold:*/
-          b.innerHTML =
-            "<strong>" + el.label.substr(0, val.length) + "</strong>";
-          b.innerHTML += el.label.substr(val.length);
-          /*insert a input field that will hold the current array item's value:*/
-          b.innerHTML += `<input type='hidden' data-latlng=${el.latlng} value='${el.label}'>`;
+        // Create an array that will contains all the refactored data
+        const arr = data.features.map((el) => {
+          return {
+            label: el.properties.label,
+            latlng: el.geometry.coordinates,
+          };
+        });
 
-          /*execute a function when someone clicks on the item value (DIV element):*/
-          b.addEventListener("click", function (e) {
-            /*insert the value for the autocomplete text field:*/
-            inp.value = this.getElementsByTagName("input")[0].value;
-            inp.dataset.latlng =
-              this.getElementsByTagName("input")[0].dataset.latlng;
-            /*close the list of autocompleted values,
+        arr.forEach((el) => {
+          if (
+            el.label.substr(0, val.length).toUpperCase() === val.toUpperCase()
+          ) {
+            /*create a DIV element for each matching element:*/
+            b = document.createElement("DIV");
+            /*make the matching letters bold:*/
+            b.innerHTML = `<strong>${el.label.substr(0, val.length)}</strong>`;
+            b.innerHTML += el.label.substr(val.length);
+            /*insert a input field that will hold the current array item's value:*/
+            b.innerHTML += `<input type='hidden' data-latlng=${el.latlng} value='${el.label}'>`;
+
+            /*execute a function when someone clicks on the item value (DIV element):*/
+            b.addEventListener("click", function (e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              inp.dataset.latlng =
+                this.getElementsByTagName("input")[0].dataset.latlng;
+              /*close the list of autocompleted values,
                 (or any other open lists of autocompleted values:*/
-            closeAllLists();
-          });
-          a.appendChild(b);
-        }
-      });
+              closeAllLists();
+            });
+            a.appendChild(b);
+          }
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }, 1200);
   });
 
@@ -142,6 +156,4 @@ function async_autocomplete(container_id) {
   document.addEventListener("click", function (e) {
     closeAllLists(e.target);
   });
-}
-
-export default async_autocomplete;
+};

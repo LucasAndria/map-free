@@ -1,10 +1,7 @@
-import autocomplete from "./autocomplete";
-import geocoding from "./geocoding.js";
+import arr_autocomplete from "./autocomplete";
+import geo_autocomplete from "./geo_autocomplete";
 import routing from "./routing";
 
-exports.autocomplete = (containerId, array, showOnEmpty) => {
-  autocomplete(containerId, array, showOnEmpty);
-};
-
-exports.geocoding = geocoding;
+exports.arr_autocomplete = arr_autocomplete;
+exports.geo_autocomplete = geo_autocomplete;
 exports.myRouting = routing;

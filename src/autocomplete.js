@@ -110,7 +110,7 @@ function autocomplete(inp, arr, showOnEmpty = false) {
   });
 }
 
-export default function (container_id, array, showOnEmpty) {
+export default (container_id, array, showOnEmpty) => {
   const container = document.getElementById(container_id);
   if (!container || container.tagName.toLowerCase() !== "div") return;
 
@@ -128,4 +128,4 @@ export default function (container_id, array, showOnEmpty) {
   }
 
   autocomplete(input, array, showOnEmpty);
-}
+};
