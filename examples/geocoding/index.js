@@ -12,5 +12,5 @@ const formGeocoding = document.querySelector(".form-geocoding");
 if (formGeocoding) {
   const input = document.getElementById("recherche_lieu");
 
-  geo_autocomplete("blabla");
+  geo_autocomplete("autocomplete_container");
 }
