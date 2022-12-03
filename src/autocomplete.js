@@ -25,6 +25,7 @@ function closeAllLists(inputNode, element) {
   }
 }
 
+/* main function */
 function autocomplete(inputNode, itemsArray, showOnEmpty = false) {
   let currentFocus;
 
@@ -32,7 +33,6 @@ function autocomplete(inputNode, itemsArray, showOnEmpty = false) {
   inputNode.addEventListener("input", function (e) {
     let autocompleteItems,
       autocompleteElement,
-      i,
       inputValue = this.value;
 
     /*close any already open lists of autocompleted values*/
@@ -50,10 +50,19 @@ function autocomplete(inputNode, itemsArray, showOnEmpty = false) {
     this.parentNode.appendChild(autocompleteItems);
 
     itemsArray.forEach((item) => {
+      /* take the first part of the array that 
+      match the length of the input value */
+      let matchItem;
+      if (typeof item === "string")
+        matchItem = item.slice(0, inputValue.length);
+
+      if (typeof item === "object")
+        matchItem = item.label.slice(0, inputValue.length);
+
+      // if items is array of String
       if (
         typeof item === "string" &&
-        item.slice(0, inputValue.length).toUpperCase() ===
-          inputValue.toUpperCase()
+        matchItem.toUpperCase() === inputValue.toUpperCase()
       ) {
         autocompleteElement = document.createElement("div");
         autocompleteElement.innerHTML = `<strong>${item.slice(
@@ -61,55 +70,56 @@ function autocomplete(inputNode, itemsArray, showOnEmpty = false) {
           inputValue.length
         )}</strong>`;
         autocompleteElement.innerHTML += item.slice(inputValue.length);
-        autocompleteElement.innerHTML += `<input type='hidden' value='${item}'>`;
+
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.value = item;
+
+        autocompleteElement.appendChild(input);
+        autocompleteItems.appendChild(autocompleteElement);
+
         autocompleteElement.addEventListener("click", function (e) {
           inputNode.value = this.getElementsByTagName("input")[0].value;
           closeAllLists(inputNode);
         });
+      }
+
+      // if items is array of object
+      if (
+        typeof item === "object" &&
+        matchItem.toUpperCase() === inputValue.toUpperCase()
+      ) {
+        const array_keys = Object.keys(item);
+        autocompleteElement = document.createElement("div");
+        autocompleteElement.innerHTML = `<strong>${item.label.slice(
+          0,
+          inputValue.length
+        )}</strong>`;
+        autocompleteElement.innerHTML += item.label.slice(inputValue.length);
+
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.value = item.label;
+
+        array_keys.forEach((key) => {
+          input.dataset[key] = item[key];
+        });
+
+        autocompleteElement.appendChild(input);
         autocompleteItems.appendChild(autocompleteElement);
+
+        autocompleteElement.addEventListener("click", function (e) {
+          const hiddenInput = this.getElementsByTagName("input")[0];
+          inputNode.value = hiddenInput.value;
+
+          array_keys.forEach((key) => {
+            inputNode.dataset[key] = hiddenInput.dataset[key];
+          });
+
+          closeAllLists(inputNode);
+        });
       }
     });
-
-    // /*for each item in the array...*/
-    // for (i = 0; i < arr.length; i++) {
-
-    //   /*check if the array is object and the value starts with the same letters as the text field value:*/
-    //   if (typeof arr[i] === "object") {
-    //     if (
-    //       arr[i].label.substr(0, val.length).toUpperCase() == val.toUpperCase()
-    //     ) {
-    //       const array_keys = Object.keys(arr[i]);
-    //       /*create a DIV element for each matching element:*/
-    //       b = document.createElement("DIV");
-    //       /*make the matching letters bold:*/
-    //       b.innerHTML =
-    //         "<strong>" + arr[i].label.substr(0, val.length) + "</strong>";
-    //       b.innerHTML += arr[i].label.substr(val.length);
-    //       /*insert a input field that will hold the current array item's value:*/
-    //       const input = document.createElement("input");
-    //       input.type = "hidden";
-    //       input.value = arr[i].label;
-    //       array_keys.forEach((key) => {
-    //         input.dataset[key] = arr[i][key];
-    //       });
-    //       b.appendChild(input);
-    //       /*execute a function when someone clicks on the item value (DIV element):*/
-    //       b.addEventListener("click", function (e) {
-    //         /*insert the value for the autocomplete text field:*/
-    //         inp.value = this.getElementsByTagName("input")[0].value;
-
-    //         array_keys.forEach((key) => {
-    //           inp.dataset[key] =
-    //             this.getElementsByTagName("input")[0].dataset[key];
-    //         });
-    //         /*close the list of autocompleted values,
-    //   (or any other open lists of autocompleted values:*/
-    //         closeAllLists(inputNode, );
-    //       });
-    //       a.appendChild(b);
-    //     }
-    //   }
-    // }
   });
 
   /*execute a function presses a key on the keyboard:*/
@@ -133,10 +143,10 @@ function autocomplete(inputNode, itemsArray, showOnEmpty = false) {
 
     /* enter pressed */
     if (e.keyCode === 13) {
-      currentFocus = -1;
       e.preventDefault();
       if (currentFocus < 0) return;
       if (element) element[currentFocus].click();
+      return;
     }
   });
 
@@ -146,6 +156,9 @@ function autocomplete(inputNode, itemsArray, showOnEmpty = false) {
   });
 }
 
+/*  exported function controller
+    get the input on the DOM inside the div container
+    verify data */
 export default (container_id, array, showOnEmpty) => {
   const container = document.getElementById(container_id);
   if (!container || container.tagName.toLowerCase() !== "div") return;
