@@ -26,7 +26,6 @@ export default (container_id) => {
 
   /*execute a function when someone writes in the text field:*/
   inp.addEventListener("input", function (e) {
-    console.log("okkkkk");
     // Reset the timeout if there are any
     if (autocomplete_timeout) clearTimeout(autocomplete_timeout);
     let a,
