@@ -25,6 +25,6 @@ const arrays_object = [
 
 autocomplete("ac-countries", countries);
 
-// autocomplete("ac-stores", stores, true);
+autocomplete("ac-stores", stores, true);
 
-autocomplete("ac-stores", arrays_object);
+// autocomplete("ac-stores", arrays_object);
