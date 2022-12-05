@@ -14,7 +14,6 @@
       id="ac-countries"
     >
       <input type="text" placeholder="countries" />
-      <div class="loader"></div>
     </div>
 
     <div
@@ -22,12 +21,16 @@
       id="ac-stores"
     >
       <input type="text" placeholder="search for my stores" />
-      <div class="loader"></div>
     </div>
 
     <style>
-      .loader {
-        /* display: none; */
+      .autocomplete-show {
+        display: block;
+      }
+      .autocomplete-hide {
+        display: none;
+      }
+      .autocomplete-loader {
         margin-left: -10%;
         border: 3px solid #f3f3f3;
         border-top: 3px solid #3498db;

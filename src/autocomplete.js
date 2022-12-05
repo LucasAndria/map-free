@@ -18,7 +18,6 @@ function closeAllLists(inputNode, element) {
   const items = document.getElementsByClassName("autocomplete-items");
 
   for (let i = 0; i < items.length; i++) {
-    console.log(items[i]);
     if (element !== items[i] && element !== inputNode) {
       items[i].parentNode.removeChild(items[i]);
     }
@@ -27,10 +26,17 @@ function closeAllLists(inputNode, element) {
 
 /* main function */
 function autocomplete(inputNode, itemsArray, showOnEmpty = false) {
+  /* create a div for the loader */
+  const loader = document.createElement("div");
+  loader.setAttribute("class", "autocomplete-loader autocomplete-hide");
+
+  inputNode.after(loader);
+
   let currentFocus;
 
   /*execute a function when someone writes in the text field:*/
   inputNode.addEventListener("input", function (e) {
+    loader.classList.replace("autocomplete-hide", "autocomplete-show");
     let autocompleteItems,
       autocompleteElement,
       inputValue = this.value;
@@ -38,11 +44,13 @@ function autocomplete(inputNode, itemsArray, showOnEmpty = false) {
     /*close any already open lists of autocompleted values*/
     closeAllLists(inputNode);
 
-    if (!inputValue && !showOnEmpty) return;
+    if (!inputValue && !showOnEmpty)
+      return loader.classList.replace("autocomplete-show", "autocomplete-hide");
+
     currentFocus = -1;
 
     /*create a DIV element that will contain the items (values):*/
-    autocompleteItems = document.createElement("DIV");
+    autocompleteItems = document.createElement("div");
     autocompleteItems.setAttribute("id", this.id + "autocomplete-list");
     autocompleteItems.setAttribute("class", "autocomplete-items");
 
@@ -120,6 +128,8 @@ function autocomplete(inputNode, itemsArray, showOnEmpty = false) {
         });
       }
     });
+
+    loader.classList.replace("autocomplete-show", "autocomplete-hide");
   });
 
   /*execute a function presses a key on the keyboard:*/
@@ -131,14 +141,12 @@ function autocomplete(inputNode, itemsArray, showOnEmpty = false) {
     if (e.keyCode === 40) {
       currentFocus++;
       addActive(element, currentFocus);
-      return;
     }
 
     /* key UP pressed */
     if (e.keyCode === 38) {
       currentFocus--;
       addActive(element, currentFocus);
-      return;
     }
 
     /* enter pressed */
@@ -146,7 +154,6 @@ function autocomplete(inputNode, itemsArray, showOnEmpty = false) {
       e.preventDefault();
       if (currentFocus < 0) return;
       if (element) element[currentFocus].click();
-      return;
     }
   });
 
