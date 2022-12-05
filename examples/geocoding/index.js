@@ -1,8 +1,11 @@
 import "leaflet";
 import geo_autocomplete from "../../src/geo_autocomplete";
 
-const formGeocoding = document.querySelector(".form-geocoding");
-
-if (formGeocoding) {
-  geo_autocomplete("autocomplete_container");
+function onSelected(data) {
+  console.log(data);
 }
+const action = {
+  selected: onSelected,
+};
+
+geo_autocomplete("autocomplete_container", action);
