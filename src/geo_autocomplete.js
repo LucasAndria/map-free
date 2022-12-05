@@ -1,54 +1,63 @@
 import axios from "axios";
-// import data from "../examples/geocoding/ressources/res_autocomplete";
 
-// Call for the autocomplete api
-async function getData(value) {
-  try {
-    const res = await axios({
-      method: "GET",
-      url: `https://api.openrouteservice.org/geocode/autocomplete?api_key=${process.env.OPEN_ROUTE_SERVICE_KEY}&text=${value}`,
-    });
-    return res.data;
-  } catch (err) {
-    console.log(err);
-    return err;
-  }
-}
+/*  exported function controller
+get the input on the DOM inside the div container
+verify data */
+export default (container_id, action = {}) => {
+  /* get the container in the DOM that match the container_id */
+  const container = document.getElementById(container_id);
+  if (!container || container.tagName.toLowerCase() !== "div")
+    return console.log("container id not found or is not a div");
 
-function addActive(items, currentFocus) {
-  if (!items) return;
-  removeActive(items);
-  if (currentFocus >= items.length) currentFocus = 0;
-  if (currentFocus < 0) currentFocus = items.length - 1;
-  /*add class "autocomplete-active":*/
-  items[currentFocus].classList.add("autocomplete-active");
-}
+  container.classList.add("autocomplete");
+  container.style.width = "fit-content";
 
-function removeActive(items) {
-  /*a function to remove the "active" class from all autocomplete items:*/
-  for (let i = 0; i < items.length; i++) {
-    items[i].classList.remove("autocomplete-active");
-  }
-}
+  /* get all the children of the container */
+  const container_children = container.children;
 
-function closeAllLists(inputNode, element) {
-  const items = document.getElementsByClassName("autocomplete-items");
-
-  for (let i = 0; i < items.length; i++) {
-    console.log(items[i]);
-    if (element !== items[i] && element !== inputNode) {
-      items[i].parentNode.removeChild(items[i]);
+  /* search for the input child */
+  let input;
+  for (let i = 0; i < container_children.length; i++) {
+    if (container_children[i].tagName.toLowerCase() === "input") {
+      input = container_children[i];
+      break;
     }
   }
-}
 
-function autocomplete(inputNode) {
+  if (!input) return console.log("no input found in the container");
+
+  autocomplete(input, action);
+};
+
+/* main function for the autocomplete of geocoding */
+function autocomplete(inputNode, action) {
   /*the autocomplete function takes two arguments,
     the text field element and an array of possible autocompleted values:*/
   let currentFocus;
 
   /* Timeout for the input field */
   let autocomplete_timeout;
+
+  /* get the height of the selected input node  */
+  const inputHeight = inputNode.clientHeight;
+  const inputWidth = inputNode.clientWidth;
+
+  /* create a div for the loader */
+  const loader = document.createElement("div");
+
+  /* style for the loading */
+  loader.style.width = `${(60 / 100) * inputHeight}px`;
+  loader.style.height = `${(60 / 100) * inputHeight}px`;
+  loader.style.marginLeft = `${inputWidth - inputHeight}px`;
+  loader.style.marginTop = `${-inputHeight}px`;
+  loader.style.border = `${inputHeight < 20 ? 3 : 5}px solid #f3f3f3`;
+  loader.style.borderTop = `${inputHeight < 20 ? 3 : 5}px solid #3498db`;
+  loader.style.borderRadius = "50%";
+  loader.style.animation = "spin 2s linear infinite";
+  loader.style.display = "none";
+
+  /* add the loader after the input */
+  inputNode.after(loader);
 
   /*execute a function when someone writes in the text field:*/
   inputNode.addEventListener("input", function (e) {
@@ -67,6 +76,8 @@ function autocomplete(inputNode) {
 
     autocomplete_timeout = setTimeout(async () => {
       currentFocus = -1;
+      /* show the loader */
+      loader.style.display = "block";
 
       /*create a DIV element that will contain the items (values):*/
       autocompleteItems = document.createElement("DIV");
@@ -79,7 +90,23 @@ function autocomplete(inputNode) {
       /* get the autocomplete data from the API */
       const data = await getData(e.target.value);
 
-      /* Create an array that will contains all the refactored data */
+      /* hide the loader after data has been requested */
+      loader.style.display = "none";
+
+      /* stop the function if there was an error */
+      if (data.statusText === "fail") {
+        return data.handledError
+          ? showError(autocompleteItems, data.message)
+          : showError(autocompleteItems, "error occured !");
+      }
+
+      /* show message if text could not be autocompleted */
+      if (data.features.length <= 0) {
+        showError(autocompleteItems, "no result found !");
+        return;
+      }
+
+      /* Create an array that will contains all the data needed */
       const itemsArray = data.features.map((el) => {
         return {
           label: el.properties.label,
@@ -88,16 +115,15 @@ function autocomplete(inputNode) {
       });
 
       itemsArray.forEach((item) => {
+        /* text that match the text inputed */
         const matchItem = item.label.slice(0, inputValue.length);
 
         if (matchItem.toUpperCase() === inputValue.toUpperCase()) {
           autocompleteElement = document.createElement("div");
-          autocompleteElement.innerHTML = `<strong>${item.label.slice(
-            0,
-            inputValue.length
-          )}</strong>`;
+          autocompleteElement.innerHTML = `<strong>${matchItem}</strong>`;
           autocompleteElement.innerHTML += item.label.slice(inputValue.length);
 
+          /* create an hidden input to store data */
           const input = document.createElement("input");
           input.type = "hidden";
           input.value = item.label;
@@ -112,10 +138,14 @@ function autocomplete(inputNode) {
             inputNode.dataset.latlng = hiddenInput.dataset.latlng;
 
             closeAllLists(inputNode);
+
+            /* call function action.selected if there is */
+            action.selected?.(item);
+            return;
           });
         }
       });
-    }, 1500);
+    }, 1000);
   });
 
   /*execute a function presses a key on the keyboard:*/
@@ -152,25 +182,75 @@ function autocomplete(inputNode) {
   });
 }
 
-/*  exported function controller
-get the input on the DOM inside the div container
-verify data */
-export default (container_id) => {
-  const container = document.getElementById(container_id);
-  if (!container || container.tagName.toLowerCase() !== "div") return;
-
-  container.classList.add("autocomplete");
-
-  const container_children = container.children;
-  if (!container_children) return;
-
-  let input;
-  for (let i = 0; i < container_children.length; i++) {
-    if (container_children[i].tagName.toLowerCase() === "input") {
-      input = container_children[i];
-      break;
-    }
+/* Function to handle all error */
+function handleError(err) {
+  if (err.message === "Network Error") {
+    return {
+      handledError: true,
+      statusText: "fail",
+      message: "unable to connect !",
+    };
   }
 
-  autocomplete(input);
-};
+  return {
+    handledError: false,
+    statusText: "fail",
+    message: "Error occured !",
+  };
+}
+
+/* Call for the autocomplete api */
+async function getData(value) {
+  try {
+    const res = await axios({
+      method: "GET",
+      url: `https://api.openrouteservice.org/geocode/autocomplete?api_key=${process.env.OPEN_ROUTE_SERVICE_KEY}&text=${value}`,
+    });
+    if (res.statusText !== "OK") {
+      throw { status: "fail", message: "Error occured!" };
+    }
+    return res.data;
+  } catch (err) {
+    return handleError(err);
+  }
+}
+
+/* add active style on the selected item */
+function addActive(items, currentFocus) {
+  if (!items) return;
+  removeActive(items);
+  if (currentFocus >= items.length) currentFocus = 0;
+  if (currentFocus < 0) currentFocus = items.length - 1;
+  /*add class "autocomplete-active":*/
+  items[currentFocus].classList.add("autocomplete-active");
+}
+
+/* remove active style */
+function removeActive(items) {
+  /*a function to remove the "active" class from all autocomplete items:*/
+  for (let i = 0; i < items.length; i++) {
+    items[i].classList.remove("autocomplete-active");
+  }
+}
+
+/* undisplay lists of items */
+function closeAllLists(inputNode, element) {
+  const items = document.getElementsByClassName("autocomplete-items");
+
+  for (let i = 0; i < items.length; i++) {
+    if (element !== items[i] && element !== inputNode)
+      items[i].parentNode.removeChild(items[i]);
+  }
+}
+
+/* message to show after the input autocomplete */
+function showError(autocompleteItems, message = "error occured!") {
+  const messageElement = document.createElement("div");
+  messageElement.setAttribute("style", "color: red; font-size: 12px;");
+  messageElement.innerHTML = message;
+
+  if (typeof autocompleteItems !== "object") return;
+  if (!autocompleteItems.classList.contains("autocomplete-items")) return;
+
+  autocompleteItems.appendChild(messageElement);
+}
