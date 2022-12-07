@@ -1,13 +1,13 @@
 import axios from "axios";
-// import data from "../examples/route/ressources/direction";
+import data from "../examples/route/ressources/direction";
 
 async function routing(startLnglat, endLnglat, profile) {
   try {
-    const res = await axios({
-      method: "GET",
-      url: `https://api.openrouteservice.org/v2/directions/${profile}?api_key=${process.env.OPEN_ROUTE_SERVICE_KEY}&start=${startLnglat}&end=${endLnglat}`,
-    });
-    const data = res.data;
+    // const res = await axios({
+    //   method: "GET",
+    //   url: `https://api.openrouteservice.org/v2/directions/${profile}?api_key=${process.env.OPEN_ROUTE_SERVICE_KEY}&start=${startLnglat}&end=${endLnglat}`,
+    // });
+    // const data = res.data;
 
     const bounds = [
       [data.bbox[0], data.bbox[1]],
