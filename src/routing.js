@@ -1,6 +1,7 @@
 import axios from "axios";
 // import data from "../examples/route/ressources/direction";
 
+/* to display a routing from point A to a point B */
 async function routing(startLnglat, endLnglat, profile) {
   try {
     const res = await axios({
