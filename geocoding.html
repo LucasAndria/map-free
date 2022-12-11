@@ -9,8 +9,11 @@
     <title>Geocoding</title>
   </head>
   <body>
-    <div id="autocomplete_container">
-      <input type="text" id="recherche_lieu" placeholder="trouver un lieu" />
+    <div class="input-container">
+      <div id="autocomplete_container">
+        <input type="text" id="recherche_lieu" placeholder="trouver un lieu" />
+      </div>
+      <div>🔍</div>
     </div>
   </body>
 
@@ -18,6 +21,9 @@
     body {
       margin: 0;
       padding: 0;
+    }
+    .input-container {
+      display: flex;
     }
   </style>
 </html>
